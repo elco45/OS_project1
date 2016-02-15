@@ -196,7 +196,7 @@ class ClientTask implements Runnable {
                     }
                     postResponse(out, key, value);
                 }else{//raw o file, guardar en .txt de todas formas
-                    FileOutputStream fos = new FileOutputStream("mi_web/incrementaresto.txt");
+                    FileOutputStream fos = new FileOutputStream("mi_web/"+primerHeader[1]);
                     byte writeToServer[] = String.valueOf(postContents).getBytes();
                     fos.write(writeToServer);
                     fos.flush();

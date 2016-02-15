@@ -66,34 +66,23 @@
 		        var i = 0, len = this.files.length, img, reader, file;
 		        for ( ; i < len; i++ ) {
 		            file = this.files[i];
-		            
-		                if ( window.FileReader ) {
-		                    reader = new FileReader();
-		                    reader.onloadend = function (e) {
-		                    };
-		                    reader.readAsDataURL(file);
-		                }
-
-		                if (formdata) {
-		                    formdata.append("image", file);
-		                    formdata.append("extra",'extra-data');
-		                }
-		                if (formdata) {
-		                    $.ajax({
-		             			url: 'http://localhost:8000',
-		                        type: "POST",
-		                        data: file,
-		                        processData: false,
-		                        contentType: false,
-		                        success: function (res) {
-		                         	$('div#response').html("Successfully uploaded");
-		                        }
-		                    });
-		                }
-		            }
-		            
-		        
-
+	                if ( window.FileReader ) {
+	                    reader = new FileReader();
+	                    reader.onloadend = function (e) {
+	                    };
+	                    reader.readAsDataURL(file);
+	                }
+                    $.ajax({
+             			url: 'http://localhost:8000/'+file.name,
+                        type: "POST",
+                        data: file,
+                        processData: false,
+                        contentType: false,
+                        success: function (res) {
+                         	$('div#response').html("Successfully uploaded");
+                        }
+                    });
+	            }
 		    }, false);
 		});
 		$('document').ready(function(){
