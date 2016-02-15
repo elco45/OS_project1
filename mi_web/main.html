@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>OS Project 1</title>
+		<meta charset="utf-8"/>
+		<link rel="stylesheet" href="style.css"></link>
+		<link rel="stylesheet" type="text/stylesheet" href="bootstrap.css" />	
+	</head>
+	<body>
+		<div class="container">
+			<div id="titulo ">
+				<h1>Cliente</h1>
+			</div>
+			<div class="row jumbotron">
+				<div class="col-md-4">
+					<form>
+						<button type="button" class="btn btn-danger" id="get_btn">Get</button>
+					</form>
+				</div>
+				<div class="col-md-4">
+					<form>
+						<span class="file-input btn btn-primary btn-file" >
+							<br>POST <input type="file" id="post_btn"/>
+						</span>
+					</form>
+					<div id="response"></div>
+				</div>
+				<div class="col-md-4">
+					<form>
+						<span class="file-input btn btn-success btn-file">
+							<br>PUT <input type="file" id="put_btn" >
+						</span>
+					</form>
+					<div id="response2"></div>
+				</div>
+			</div>
+			<div class="row get_img" style="display:none">
+				<input type="text" id="input_get"></input>
+				<button type="button" class="btn_default" id='find_get' >Find</button>
+				<img id="randImage">
+			</div>
+		</div>
+		<output id="list"></output>
+	</body>
+	<script src="jquery.js"></script>
+	<script type="text/javascript">
+		$('#get_btn').on('click',function(){
+			$('.get_img').show();
+		});
+		$('#find_get').on('click',function(){
+			$.ajax({
+				type: "GET",
+				url: 'http://localhost:8000/'+$('#input_get').val()
+			}).success(function(data){
+				var win = window.open('http://localhost:8000/'+$('#input_get').val(), '_blank');
+  				win.focus();
+			});
+		});
+		$('document').ready(function(){
+		    var input = document.getElementById("post_btn");
+		    var formdata = false;
+		    if (window.FormData) {
+		        formdata = new FormData();
+		    }
+		    input.addEventListener("change", function (evt) {
+		        var i = 0, len = this.files.length, img, reader, file;
+		        for ( ; i < len; i++ ) {
+		            file = this.files[i];
+		            
+		                if ( window.FileReader ) {
+		                    reader = new FileReader();
+		                    reader.onloadend = function (e) {
+		                    };
+		                    reader.readAsDataURL(file);
+		                }
+
+		                if (formdata) {
+		                    formdata.append("image", file);
+		                    formdata.append("extra",'extra-data');
+		                }
+		                if (formdata) {
+		                    $.ajax({
+		             			url: 'http://localhost:8000',
+		                        type: "POST",
+		                        data: file,
+		                        processData: false,
+		                        contentType: false,
+		                        success: function (res) {
+		                         	$('div#response').html("Successfully uploaded");
+		                        }
+		                    });
+		                }
+		            }
+		            
+		        
+
+		    }, false);
+		});
+		$('document').ready(function(){
+		    var input = document.getElementById("put_btn");
+		    var formdata = false;
+		    if (window.FormData) {
+		        formdata = new FormData();
+		    }
+		    input.addEventListener("change", function (evt) {
+		        var i = 0, len = this.files.length, img, reader, file;
+		        for ( ; i < len; i++ ) {
+		            file = this.files[i];
+		            if (!!file.type.match(/image.*/)) {
+		                if ( window.FileReader ) {
+		                    reader = new FileReader();
+		                    reader.onloadend = function (e) {
+		                    };
+		                    reader.readAsDataURL(file);
+		                }
+
+		                if (formdata) {
+		                    formdata.append("image", file);
+		                    formdata.append("extra",'extra-data');
+		                }
+		                if (formdata) {
+		                    $.ajax({
+		             			url: 'http://localhost:8000',
+		                        type: "PUT",
+		                        data: formdata,
+		                        processData: false,
+		                        contentType: false,
+		                        success: function (res) {
+		                         	$('div#response2').html("Successfully uploaded");
+		                        }
+		                    });
+		                }
+		            }
+		            else
+		            {
+		                alert('Not a vaild image!');
+		            }
+		        }
+
+		    }, false);
+		});
+		var byteArrayToBase64 = function(byteArr){
+		    var base64s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		    var encOut = "";
+		    var bits;
+		    var i = 0;
+		    
+		    while(byteArr.length >= i+3){
+		        bits = (byteArr[i++] & 0xff) << 16 | (byteArr[i++] & 0xff) << 8 | byteArr[i++] & 0xff;
+		        encOut += base64s.charAt((bits & 0x00fc0000) >> 18) + base64s.charAt((bits & 0x0003f000) >> 12) + base64s.charAt((bits & 0x00000fc0) >> 6) + base64s.charAt((bits & 0x0000003f));
+		    }
+		    if(byteArr.length-i > 0 && byteArr.length-i < 3){
+		        var dual = Boolean(byteArr.length - i - 1);
+		        bits = ((byteArr[i++] & 0xff) << 16) | (dual ? (byteArr[i] & 0xff) << 8 : 0);
+		        encOut += base64s.charAt((bits & 0x00fc0000) >> 18) + base64s.charAt((bits & 0x0003f000) >> 12) + (dual ? base64s.charAt((bits & 0x00000fc0) >> 6) : '=') + '=';
+		    }
+		    
+		    return encOut;
+		};
+		    
+		var base64ToByteArray = function(encStr){
+		    var base64s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+		    var decOut = new air.ByteArray();  
+		    var bits;
+		    
+		    for(var i = 0, j = 0; i<encStr.length; i += 4, j += 3){
+		        bits = (base64s.indexOf(encStr.charAt(i)) & 0xff) <<18 | (base64s.indexOf(encStr.charAt(i +1)) & 0xff) <<12 | (base64s.indexOf(encStr.charAt(i +2)) & 0xff) << 6 | base64s.indexOf(encStr.charAt(i +3)) & 0xff;
+		        decOut[j+0] = ((bits & 0xff0000) >> 16);
+		        if(i+4 != encStr.length || encStr.charCodeAt(encStr.length - 2) != 61){
+		            decOut[j+1] = ((bits & 0xff00) >> 8);
+		        }
+		        if(i+4 != encStr.length || encStr.charCodeAt(encStr.length - 1) != 61){
+		            decOut[j+2] = (bits & 0xff);
+		        }
+		    }
+		    
+		    return decOut;
+		};
+	
+	</script>
+
+</html>
